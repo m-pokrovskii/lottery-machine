@@ -10,16 +10,34 @@ const LotteryMachine = () => {
   const [isSpinning, setIsSpinning] = useState(false);
   
   // Constants
-  const TOTAL_ITEMS = 114; // For test purposes, will be 114 in production
+  const TOTAL_ITEMS = 100; // For test purposes, will be 114 in production
   const REPEAT_INCREASE = ((1 / TOTAL_ITEMS) * 100) * 2; // Percentage increase for repeats
   
   // Items data - simplified for testing
-  const items = Array.from({ length: TOTAL_ITEMS }, (_, i) => ({
-    id: i + 1,
-    name: `Item ${i + 1}`,
-    rarity: i < 3 ? 'Common' : i < 7 ? 'Uncommon' : 'Rare',
-    color: i < 3 ? 'text-gray-500' : i < 7 ? 'text-blue-500' : 'text-purple-500'
-  }));
+  const items = Array.from({ length: TOTAL_ITEMS }, (_, i) => {
+		let rarity, styling;
+		const itemPercent = ((i + 1) / TOTAL_ITEMS) * 100;
+		if (itemPercent <= 50) {
+			rarity = 'Common';
+			styling = 'text-gray-500 bg-gray-500/30 border-gray-500 '
+		} else if (itemPercent <= 80) {
+			rarity = 'Uncommon';
+			styling = 'text-blue-500 bg-blue-500/30 border-blue-500 '			
+		} else if (itemPercent <= 95) {
+			rarity = 'Rare';
+			styling = 'text-purple-500 bg-purple-500/30 border-purple-500 '
+		} else {
+			rarity = 'Legendary';
+			styling = 'text-amber-500 bg-amber-500/30 border-amber-500 '
+		}
+		return {
+			id: i + 1,
+			name: `Item ${i + 1}`,
+			rarity,
+			styling,
+			amount: 1
+  	}
+	});
   
   // Load collection from localStorage on initial render
   useEffect(() => {
@@ -31,17 +49,22 @@ const LotteryMachine = () => {
   
   // Save collection to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('lotteryCollection', JSON.stringify(collection));
-    
     // Calculate repeat rate based on collection
     if (collection.length > 0) {
+			localStorage.setItem('lotteryCollection', JSON.stringify(collection));
       const baseRepeatRate = collection.length * REPEAT_INCREASE;
       const coinDiscount = (coins - 1) * REPEAT_INCREASE;
       setRepeatRate(Math.max(0, baseRepeatRate - coinDiscount));
     } else {
       setRepeatRate(0);
     }
-  }, [collection, coins]);
+  }, [collection]);
+
+	useEffect(() => {
+      const coinDiscount = (coins - 1) * REPEAT_INCREASE;
+			const baseRepeatRate = collection.length * REPEAT_INCREASE;
+      setRepeatRate(Math.max(0, baseRepeatRate - coinDiscount));
+  }, [coins]);
   
   // Handle spin button click
   const handleSpin = () => {
@@ -53,10 +76,7 @@ const LotteryMachine = () => {
     setTimeout(() => {
       // Get all unique item IDs in collection
       const collectedIds = collection.map(item => item.id);
-      
-      // Calculate probabilities
-      let newItemProbability = 100 - repeatRate;
-      
+         
       // Roll for item
       const isRepeat = Math.random() * 100 < repeatRate;
       let winItem;
@@ -78,7 +98,13 @@ const LotteryMachine = () => {
       // Add the item to collection if not already there
       if (!collectedIds.includes(winItem.id)) {
         setCollection(prev => [...prev, winItem]);
-      }
+      } else {
+				setCollection(prev => 
+					prev.map(item=>
+						item.id === winItem.id ? {...item, amount: item.amount + 1} : item
+					)
+				);
+			}
       
       // Set last win
       setLastWin(winItem);
@@ -130,7 +156,7 @@ const LotteryMachine = () => {
           <input
             type="number"
             min="1"
-            max="10"
+            max={TOTAL_ITEMS}
             value={inputCoins}
             onChange={(e) => setInputCoins(Math.max(1, parseInt(e.target.value) || 1))}
             className="w-full p-2 border border-gray-300 rounded"
@@ -170,15 +196,16 @@ const LotteryMachine = () => {
             Reset
           </button>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-2 bg-white rounded shadow-inner max-h-64 overflow-y-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 p-5 bg-white rounded shadow-inner max-h-64 overflow-y-auto">
           {collection.length > 0 ? (
             collection.map((item) => (
               <div
                 key={item.id}
-                className={`p-2 rounded border ${item.color.replace('text', 'border')} ${item.color.replace('text', 'bg')}/10`}
+                className={`relative p-2 rounded border ${item.styling}`}
               >
-                <div className={`font-medium ${item.color}`}>{item.name}</div>
+                <div className={`font-medium`}>{item.name}</div>
                 <div className="text-xs">{item.rarity}</div>
+								{item.amount > 1 ? <span className="absolute top-0 end-0 inline-flex items-center py-0.5 px-1.5 rounded-full text-xs font-medium transform -translate-y-1/2 translate-x-1/2 bg-red-500 text-white border-white border-3">{item.amount}</span> : "" }
               </div>
             ))
           ) : (
