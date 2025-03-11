@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 const LotteryMachine = () => {
   // State variables
   const [coins, setCoins] = useState(1);
-  const [inputCoins, setInputCoins] = useState(1);
   const [repeatRate, setRepeatRate] = useState(0);
   const [collection, setCollection] = useState([]);
   const [lastWin, setLastWin] = useState(null);
@@ -110,8 +109,6 @@ const LotteryMachine = () => {
       setLastWin(winItem);
       
       // Reset coins
-      setCoins(1);
-      setInputCoins(1);
       setIsSpinning(false);
     }, 1500);
   };
@@ -157,8 +154,8 @@ const LotteryMachine = () => {
             type="number"
             min="1"
             max={TOTAL_ITEMS}
-            value={inputCoins}
-            onChange={(e) => setInputCoins(Math.max(1, parseInt(e.target.value) || 1))}
+            value={coins}
+						onChange={(e) => setCoins(Math.max(1, parseInt(e.target.value) || 1))}
             className="w-full p-2 border border-gray-300 rounded"
             disabled={isSpinning}
           />
@@ -166,13 +163,6 @@ const LotteryMachine = () => {
         <div className="flex-grow">
           <label className="block text-sm font-medium mb-1">Actions</label>
           <div className="flex">
-            <button
-              onClick={() => setCoins(inputCoins)}
-              className="flex-1 bg-green-400 text-white p-2 rounded mr-2 hover:bg-green-600 transition"
-              disabled={isSpinning}
-            >
-              Insert
-            </button>
             <button
               onClick={handleSpin}
               className={`flex-1 p-2 rounded text-white transition ${isSpinning ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'}`}
