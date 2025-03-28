@@ -76,7 +76,7 @@ const LotteryMachine = () => {
       // Get all unique item IDs in collection
       const collectedIds = collection.map(item => item.id);
          
-      // Roll for item
+      // Roll for item. Cause random selection from array sucks.
       const isRepeat = Math.random() * 100 < repeatRate;
       let winItem;
       
