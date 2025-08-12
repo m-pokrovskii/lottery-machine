@@ -48,5 +48,7 @@ Lottery Machine is a React SPA that simulates a lottery machine with spinning an
 git clone https://github.com/m-pokrovskii/lottery-machine.git
 cd lottery-machine
 npm install
-npm start
- 
+npm run dev
+```
+Open http://localhost:5173
+
