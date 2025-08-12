@@ -1,4 +1,4 @@
-# Lottery Machine 🎰
+# Lottery Machine from Danganronpa Video Game 🎰
 
 **Interactive lottery machine built with React featuring item collection and dynamic repeat chance.**
 
@@ -38,7 +38,7 @@ Lottery Machine is a React SPA that simulates a lottery machine with spinning an
 
 ## Demo
 
-[Live Demo](#)  
+[Live Demo](https://lottery-machine-sandy.vercel.app/) - Lottery Machine from Danganronpa video game
 
 ---
 
